@@ -9,5 +9,4 @@ urlpatterns = [
     url(r'^(\w+)/$', views.blogcenter),
     url(r'^(\w+)/(category|tag|archive)/(.*)/$', views.blogcenter),
 
-
 ]

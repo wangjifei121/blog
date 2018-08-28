@@ -39,8 +39,8 @@ urlpatterns = [
     # 评论
     url(r'^comment/$', views.comment),
     # 初始展示url
-    url(r'^$', views.Home.as_view()) ,
-    url(r'^add_article/$',views.add_article),
+    url(r'^$', views.Home.as_view()),
+    url(r'^add_article/$', views.add_article),
 
 ]
 # django-debug-toolbar
@@ -50,3 +50,5 @@ if settings.DEBUG:
     urlpatterns = [
                       url(r'^__debug__/', include(debug_toolbar.urls)),
                   ] + urlpatterns
+
+
