@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap-3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/mycss.css">
+</head>
+<body>
+<div class="container" style="margin-top: 50px">
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <div class="panel panel-info" style="border: none">
+                <div class="panel-heading text-center">
+                    <h4>用户注册</h4>
+                </div>
+                <div class="panel-bady">
+                    <form>
+                        {% csrf_token %}
+                        {% for field in register_obj %}
+                            <div class="form-group">
+                                <label class="letleft" for="field.id_for_label">{{ field.label }}</label>
+                                {{ field }}
+                                <span class="err-msg"></span>
+                            </div>
+                        {% endfor %}
+                        <div class="form-group">
+                            <label for="avatar">用户头像<img id="avatar-img" src="/media/avatars/default.png" alt="用户头像"
+                                                         style="height: 80px;width: 80px;margin-left: 15px"></label>
+                            <input type="file" accept="image/*" id="avatar" style="display: none;">
+                            <button type="button" id="register-btn" class="btn btn-success letleft">提交</button>
+                        </div>
+                        <div id="popup-captcha"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script>
+    $(function () {
+        $("#register-btn").click(function () {
+            //ajax提交数据时，当有文件或者图片时，需要借助FormData对象来实现数据前后端交互，FormData
+            // 相当于是一个打包数据的工具，将需要传输的数据通过append方法以键值对的方式添加到FormData对象中
+            let formdata = new FormData();
+            formdata.append('username', $('#id_username').val());
+            formdata.append('phone', $('#id_phone').val());
+            formdata.append('password', $('#id_password').val());
+            formdata.append('re_password', $('#id_re_password').val());
+            formdata.append('email', $('#id_email').val());
+            //设置csrftoken来防止跨站csrf攻击
+            formdata.append('csrfmiddlewaretoken', $("[name='csrfmiddlewaretoken']").val());
+            //通过jquery对象获取文件需要将jquery对象转化成js对象再调用js对象的files方法
+            formdata.append('avatar_file', $("#avatar")[0].files[0]);
+            $.ajax({
+                url: '/register/',
+                type: 'post',
+                processData: false,   //不让jQuery处理我的obj
+                contentType: false,  // 不让jQuery设置请求的内容类型
+                data: formdata,
+                success: function (res) {
+                    if (res.code === 0) {
+                        location.href = res.msg
+                    }
+                    if (res.code === 1) {
+                        $('#id_username').next().text(res.msg)
+                    }
+                    if (res.code === 2) {
+                        $('#id_phone').next().text(res.msg)
+                    }
+                    if (res.code === 3) {
+                        $('#id_email').next().text(res.msg)
+                    }
+                    if (res.code === 4) {
+                        $.each(res.msg, function (k, v) {
+                            //添加错误提示样式
+                            $("#id_" + k).next().text(v[[0]]).parent().addClass('err-msg')
+
+                        })
+                    }
+                }
+            });
+        });
+        // 前端页面实现头像预览
+        // 当用户选中文件之后，也就是头像的input标签有值时触发
+        $("#avatar").change(function () {
+            // 找到用户选中的那个文件
+            let file = this.files[0];
+            // 生成一个读文件的对象
+            let fr = new FileReader();
+            // 从文件中读取头像文件数据
+            fr.readAsDataURL(file);
+            // 等到读完之后
+            fr.onload = function () {
+                // 将头像img标签的src属性更换成我选中的那个文件
+                $("#avatar-img").attr("src", fr.result)
+            }
+        });
+
+        //input标签聚焦清空样式
+        $('input').focus(function () {
+            $(this).next().text('').parent().removeClass('err-msg')
+        });
+
+    })
+</script>
+
+</body>
+</html>

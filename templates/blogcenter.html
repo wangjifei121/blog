@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block page-main %}
+    <!--右侧栏开始-->
+    <div class="col-md-10">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                用户中心
+            </div>
+            <div class="panel-body">
+                <div class="bady" style="font-family: 微软雅黑">
+                    {% for article in article_list %}
+                        <div class="media media-bottom">
+                            <h3 style="color: #2aabd2" class="media-heading"><a
+                                    href="/{{ article.user.username }}/p/{{ article.id }}">{{ article.title }}</a>
+                            </h3>
+                            <div class="media-body">
+                                {{ article.desc }}
+                            </div>
+                            <div class="span-container">
+                                <span>发布于：{{ article.create_time|date:'Y-m-d  H:i:s' }}</span>
+                                <span class="glyphicon glyphicon-comment"></span>
+                                <span>({{ article.comment_count }})</span>
+                                <span class="glyphicon glyphicon-thumbs-up"></span>
+                                <span>({{ article.up_count }})</span>
+                            </div>
+
+                        </div>
+                        <hr>
+                    {% empty %}
+                        <div class="media media-bottom">
+                            空空如也
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+        {{ page_html|safe }}
+    </div>
+    <!--右侧栏结束-->
+{% endblock page-main %}

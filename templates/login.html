@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户登录</title>
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap-3.3.7/css/bootstrap.css">
+</head>
+<body>
+<div class="container" style="margin-top: 50px">
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <div class="panel panel-info" style="border: none">
+                <div class="panel-heading text-center">
+                    <h4>用户登录</h4>
+                </div>
+                <div class="panel-bady">
+                    <form class="letleft">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="login_obj.name.id_for_label">{{ login_obj.name.label }}</label>
+                            {{ login_obj.name }}
+                        </div>
+                        <div class="form-group">
+                            <label for="login_obj.pwd.id_for_label">{{ login_obj.pwd.label }}</label>
+                            {{ login_obj.pwd }}
+                        </div>
+                        <div class="form-group">
+                            <label for="login_obj.pwd.id_for_label" style="display: block">验证码</label>
+                            <input type="text" id="v_code" class="form-control"
+                                   style="display: inline-block;width: 250px">
+                            <img src="/v_code/" id="v_code_msg" alt="验证码"
+                                 style="float: right;margin-right: 10px;border-radius: 5px">
+                        </div>
+                        <p id="err-msg" style="color: red"></p>
+                        <button type="button" id="login-btn" class="btn btn-success">提交</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script src="/static/bootstrap/bootstrap-3.3.7/js/bootstrap.js"></script>
+<script>
+    $(function () {
+        $("#login-btn").click(function () {
+            var next = location.search; //获取url中"?"符后的字串
+            var name = $('#id_name').val();
+            var pwd = $('#id_pwd').val();
+            var csrftoken = $("[name='csrfmiddlewaretoken']").val();
+            var v_code = $('#v_code').val();
+            $.ajax({
+                    url: '/login/',
+                    type: 'post',
+                    data: {
+                        name: name,
+                        pwd: pwd,
+                        csrfmiddlewaretoken: csrftoken,
+                        v_code: v_code
+                    },
+                    success: function (res) {
+                        if (res.code !== 0) {
+                            //有错误
+                            $('#err-msg').text(res.err_msg)
+                        } else {
+                            console.log(next);
+                            if (next) {
+                                location.href = next.split('=')[1]
+                            } else {
+                                location.href = '/home/'
+                            }
+                        }
+                    }
+                }
+            )
+        });
+        $('input').focus(function () {
+            $('#err-msg').text('')
+        });
+        $("#v_code_msg").click(function () {
+            var url = this.src;
+            if (/\?$/.test(url)) {
+                this.src = url.slice(0, -1)
+            } else {
+                this.src = url + "?"
+            }
+        })
+    })
+
+</script>
+
+
+</body>
+</html>
